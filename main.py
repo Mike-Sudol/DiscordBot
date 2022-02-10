@@ -1,36 +1,46 @@
+print("hi")
+import discord
 import os
-from keep_alive import keep_alive
-from discord.ext import commands
+import discord.ext
+from discord.utils import get
+from discord.ext import commands, tasks
+from replit import db
+from keepalive import keep_alive
 
-bot = commands.Bot(
-	command_prefix="!",  # Change to desired prefix
-	case_insensitive=True  # Commands aren't case-sensitive
-)
+client = discord.Client()
+client = commands.Bot(command_prefix = '!')
 
-bot.author_id = 487258918465306634  # Change to your discord id!!!
-
-@bot.event 
-async def on_ready():  # When the bot is ready
-    print("I'm in")
-    print(bot.user)  # Prints the bot's username and identifier
-    for guild in client.guilds:
-        if guild.name == GUILD:
-            break
-
-    print(
-        f'{client.user} is connected to the following guild:\n'
-        f'{guild.name}(id: {guild.id})'
-    )
+@client.event
+async def on_ready():
+  print("Online")     
+    
+@client.command()
+async def ping(ctx):
+  await ctx.send("pong!") 
 
 
-extensions = [
-	'cogs.cog_example'  # Same name as it would be if you were importing it
-]
+@client.event
+async def on_message(message):
+  if message.author == client.user:
+    return
 
-if __name__ == '__main__':  # Ensures this is the file being ran
-	for extension in extensions:
-		bot.load_extension(extension)  # Loades every extension.
+  msg = message.content
+  aut = str(message.author)
 
-keep_alive()  # Starts a webserver to be pinged.
-token = os.environ.get("DISCORD_BOT_SECRET") 
-bot.run(token)  # Starts the bot
+  if msg.startswith("!shorts"):
+    await message.channel.send("stinks")
+
+  if msg.startswith("!check"):
+    for key in db.keys():
+      await message.channel.send(str(aut) + " has sent " + str(db[key]) + " messages")
+  
+  if aut in db.keys():
+    val = db[aut] + 1
+    print("Increasing " + aut +" to "+ str(db[aut]))
+    db[aut] = val
+  else:
+    print("Creating " + aut)
+    db[aut] = 1
+
+#keep_alive()
+client.run(os.environ['TOKEN'])
