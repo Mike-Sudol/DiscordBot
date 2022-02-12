@@ -33,7 +33,7 @@ async def on_message(message):
   msg = message.content
   aut = str(message.author)
 
-  if msg.startswith("!shorts"):
+  if msg.startswith("!status"):
     await message.channel.send("stinks")
 
   if msg.startswith("!check"):
